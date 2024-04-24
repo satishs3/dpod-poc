@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpod-deployment
+  namespace: dpod
+  labels:
+    app: dpod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dpod
+  template:
+    metadata:
+      labels:
+        app: dpod
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: dpod-api
+        image: docker.repo.eng.netapp.com/global/devts-daas/dpod
+        ports:
+        - containerPort: 80
+      - name: dpod-sign
+        image: ci-registry.rtp.openenglab.netapp.com:8022/jenkins-centos7:1.27.0
+        command: [ "sleep" ]
+        args: [ "infinity" ]
