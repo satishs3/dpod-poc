@@ -7,6 +7,8 @@ WORKDIR /dpod
 # 
 COPY ./requirements.txt /dpod/requirements.txt
 
+COPY ./startup-uvicorn.sh /dpod/startup-uvicorn.sh
+
 # 
 RUN pip install --no-cache-dir --upgrade -r /dpod/requirements.txt
 
@@ -14,4 +16,4 @@ RUN pip install --no-cache-dir --upgrade -r /dpod/requirements.txt
 COPY ./app /dpod/app
 
 # 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["/bin/sh", "./startup-uvicorn.sh"]
