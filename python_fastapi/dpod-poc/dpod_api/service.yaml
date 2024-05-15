@@ -5,7 +5,7 @@ metadata:
   namespace: dpod-api
 spec:
   selector:
-    app: dpod
+    app: dpod-api
   ports:
     - protocol: TCP
       port: 80
