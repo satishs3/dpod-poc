@@ -20,6 +20,7 @@ spec:
       - name: dpod-api
         image: docker.repo.eng.netapp.com/global/devts-daas/dpod-python3.10:v1
         imagePullPolicy: Always
+        workingDir: /dpod
         ports:
         - containerPort: 80
         command: ["/bin/sh", "/dpod/startup-uvicorn.sh"]
