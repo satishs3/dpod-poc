@@ -15,7 +15,6 @@ RUN yum update -y && \
 # Install the HSM DPOD client
 RUN mkdir -p /root/HSM_DPOD && mkdir -p /tmp/HSM_DPOD
 COPY setup-openssl_sign-mar2024-v10.5.0-470.zip  /tmp/HSM_DPOD
-COPY startup-uvicorn.sh /dpod
 RUN cd /tmp/HSM_DPOD && \
     unzip setup-openssl_sign-mar2024-v10.5.0-470.zip && \
     tar -xvf cvclient-min.tar && \
@@ -66,6 +65,7 @@ RUN wget https://bootstrap.pypa.io/get-pip.py && \
 
 # Install the requirements for the FastAPI application
 WORKDIR /dpod
+COPY startup-uvicorn.sh /dpod
 COPY ./requirements.txt /dpod/requirements.txt
 RUN pip3.10 install --no-cache-dir --upgrade -r /dpod/requirements.txt
 COPY ./app /dpod/app
