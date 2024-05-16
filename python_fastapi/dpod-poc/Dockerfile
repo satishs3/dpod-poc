@@ -15,6 +15,7 @@ RUN yum update -y && \
 # Install the HSM DPOD client
 RUN mkdir -p /root/HSM_DPOD && mkdir -p /tmp/HSM_DPOD
 COPY setup-openssl_sign-mar2024-v10.5.0-470.zip  /tmp/HSM_DPOD
+COPY startup-uvicorn.sh /dpod
 RUN cd /tmp/HSM_DPOD && \
     unzip setup-openssl_sign-mar2024-v10.5.0-470.zip && \
     tar -xvf cvclient-min.tar && \
