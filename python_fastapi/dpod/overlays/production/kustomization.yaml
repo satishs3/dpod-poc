@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dpod-api-pord
+resources:
+- ../../base/
+namePrefix: prod-
+replicas:
+  - name: dpod-deployment
+    count: 2
+patches:
+- target:
+    kind: Namespace
+    name: default
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: dpod-api-prod
+patchesStrategicMerge:
+- deployment-patch.yaml
+images:
+- name: docker.repo.eng.netapp.com/global/devts-daas/dpod-python3.10
+  newTag: v1prod1

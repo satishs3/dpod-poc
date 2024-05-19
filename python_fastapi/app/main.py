@@ -1,11 +1,14 @@
-from fastapi import FastAPI, status, HTTPException, Response
+from fastapi import FastAPI, status
 from pydantic import BaseModel
 from typing import Optional
-import docker
-import subprocess
-
+from logger import logger
+from middleware import log_requests
+from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
+app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
+
+logger.debug("Starting the application")
 
 class ImageRegistry(BaseModel):
     registry_url: str
@@ -55,4 +58,8 @@ def sign_image(payload: Image):
         return {"message": "Failed to sign image", "error": str(e)}
     return {"message": "Image signed successfully",
             "image name": f"signed image {payload.image_url}"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0,0,0,0", port=8000)
 

@@ -1,0 +1,3 @@
+/dpod_venv
+python_fastapi/app/app.log
+python_fastapi/app/__pycache__

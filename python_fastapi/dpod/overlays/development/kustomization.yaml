@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dpod-api-dev
+resources:
+- ../../base/
+namePrefix: dev-
+replicas:
+  - name: dpod-deployment
+    count: 1
+patches:
+- target:
+    kind: Namespace
+    name: default
+  patch: |-
+    - op: replace
+      path: /metadata/name
+      value: dpod-api-dev
+patchesStrategicMerge:
+- deployment-patch.yaml
+images:
+- name: docker.repo.eng.netapp.com/global/devts-daas/dpod-python3.10
+  newTag: v1dev1

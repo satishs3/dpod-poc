@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpod-deployment
+  labels:
+    app: dpod-api
+spec:
+  selector:
+    matchLabels:
+      app: dpod-api
+  template:
+    metadata:
+      labels:
+        app: dpod-api
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: dpod-api
+        image: docker.repo.eng.netapp.com/global/devts-daas/dpod-python3.10:v1
+        imagePullPolicy: Always
+        workingDir: /dpod
+        ports:
+        - containerPort: 80
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        command: ["/bin/sh", "/dpod/startup-uvicorn.sh"]
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "0.5"
+            memory: "500Mi"

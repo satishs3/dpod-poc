@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpod-deployment
+  labels:
+    app: dpod-api
+spec:
+  selector:
+    matchLabels:
+      app: dpod-api
+  template:
+    metadata:
+      labels:
+        app: dpod-api
+    spec:
+      shareProcessNamespace: true
+      containers:
+      - name: dpod-api
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "1"
+            memory: "1Gi"

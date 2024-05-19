@@ -1,0 +1,39 @@
+2024-05-17 20:36:05,450 - root - DEBUG - Fetching secret 'my-secret' from namespace 'None'
+2024-05-17 20:36:06,997 - kubernetes.client.rest - DEBUG - response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"secrets \"my-secret\" not found","reason":"NotFound","details":{"name":"my-secret","kind":"secrets"},"code":404}
+
+2024-05-17 20:36:06,998 - root - ERROR - Exception when calling CoreV1Api->read_namespaced_secret: (404)
+Reason: Not Found
+HTTP response headers: HTTPHeaderDict({'Date': 'Fri, 17 May 2024 15:06:07 GMT', 'Content-Type': 'application/json', 'Content-Length': '192', 'Connection': 'keep-alive', 'Audit-Id': 'f7d1d05d-08d4-4093-a1fc-4d866db64c92', 'Cache-Control': 'no-cache, no-store, must-revalidate, no-cache, private', 'X-Api-Cattle-Auth': 'true', 'X-Content-Type-Options': 'nosniff', 'X-Kubernetes-Pf-Flowschema-Uid': 'de2782a2-0850-4e84-8aca-426b0636c8d7', 'X-Kubernetes-Pf-Prioritylevel-Uid': '67138417-6225-4287-910b-e874c8d7b709'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"secrets \"my-secret\" not found","reason":"NotFound","details":{"name":"my-secret","kind":"secrets"},"code":404}
+
+
+Traceback (most recent call last):
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/python_fastapi/app/lib/kubernetesClient.py", line 22, in get_namespaced_secret
+    secret = self.kube_api.read_namespaced_secret(name=secret_name, namespace=namespace)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/apis/core_v1_api.py", line 19469, in read_namespaced_secret
+    (data) = self.read_namespaced_secret_with_http_info(name, namespace, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/apis/core_v1_api.py", line 19547, in read_namespaced_secret_with_http_info
+    return self.api_client.call_api('/api/v1/namespaces/{namespace}/secrets/{name}', 'GET',
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 330, in call_api
+    return self.__call_api(resource_path, method,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 163, in __call_api
+    response_data = self.request(method, url,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/api_client.py", line 351, in request
+    return self.rest_client.GET(url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 227, in GET
+    return self.request("GET", url,
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/satish3/Documents/dpod-poc/dpod-poc/dpod_venv/lib/python3.11/site-packages/kubernetes/client/rest.py", line 222, in request
+    raise ApiException(http_resp=r)
+kubernetes.client.rest.ApiException: (404)
+Reason: Not Found
+HTTP response headers: HTTPHeaderDict({'Date': 'Fri, 17 May 2024 15:06:07 GMT', 'Content-Type': 'application/json', 'Content-Length': '192', 'Connection': 'keep-alive', 'Audit-Id': 'f7d1d05d-08d4-4093-a1fc-4d866db64c92', 'Cache-Control': 'no-cache, no-store, must-revalidate, no-cache, private', 'X-Api-Cattle-Auth': 'true', 'X-Content-Type-Options': 'nosniff', 'X-Kubernetes-Pf-Flowschema-Uid': 'de2782a2-0850-4e84-8aca-426b0636c8d7', 'X-Kubernetes-Pf-Prioritylevel-Uid': '67138417-6225-4287-910b-e874c8d7b709'})
+HTTP response body: {"kind":"Status","apiVersion":"v1","metadata":{},"status":"Failure","message":"secrets \"my-secret\" not found","reason":"NotFound","details":{"name":"my-secret","kind":"secrets"},"code":404}
+
+
