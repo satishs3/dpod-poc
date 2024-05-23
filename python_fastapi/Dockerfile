@@ -73,7 +73,4 @@ COPY ./app /dpod/app
 # start the FastAPI application
 ENTRYPOINT ["/bin/sh", "./startup-uvicorn.sh"]
 
-
-WORKDIR /root/HSM_DPOD
-
 #End of the Dockerfile

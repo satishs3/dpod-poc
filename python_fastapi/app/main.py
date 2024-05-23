@@ -4,7 +4,7 @@ from fastapi import FastAPI, status
 from pydantic import BaseModel
 from typing import Optional
 from logger import logger
-from middleware import log_requests
+from app.middleware import log_requests
 from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
