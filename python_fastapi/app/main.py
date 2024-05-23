@@ -1,3 +1,5 @@
+import docker
+import subprocess
 from fastapi import FastAPI, status
 from pydantic import BaseModel
 from typing import Optional
