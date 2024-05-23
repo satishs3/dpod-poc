@@ -71,6 +71,6 @@ RUN pip3.10 install --no-cache-dir --upgrade -r /dpod/requirements.txt
 COPY ./app /dpod/app
 
 # start the FastAPI application
-ENTRYPOINT ["/bin/sh", "./startup-uvicorn.sh"]
+ENTRYPOINT ["/bin/sh", "/dpod/startup-uvicorn.sh"]
 
 #End of the Dockerfile
