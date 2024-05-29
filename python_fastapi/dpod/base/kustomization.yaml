@@ -5,6 +5,7 @@ resources:
 - deployment.yaml
 - service.yaml
 - namespace.yaml
+- roleBindingDpod.yaml
 
 commonLabels:
   managed-by: Kustomize
