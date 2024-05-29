@@ -1,3 +1,4 @@
 /dpod_venv
 python_fastapi/app/app.log
 python_fastapi/app/__pycache__
+python_fastapi/app/lib/conjur.pem

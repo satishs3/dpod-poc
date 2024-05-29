@@ -21,6 +21,11 @@ spec:
         workingDir: /dpod
         ports:
         - containerPort: 80
+        volumeMounts:
+          - name: ca-pemstore
+            mountPath: /dpod/conjur.pem
+            subPath: conjur.pem
+            readOnly: false
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -34,3 +39,7 @@ spec:
           requests:
             cpu: "0.5"
             memory: "500Mi"
+      volumes:
+        - name: ca-pemstore
+          configMap:
+            name: ca-pemstore
