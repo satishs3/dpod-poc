@@ -1,11 +1,6 @@
-# 
-# This Containerfile is used to build the Container image that can be used for signing the container images
 FROM docker.repo.eng.netapp.com/rhel8/podman:8.9-1
 USER root
 
-# ARG CODE_SIGNING_WORKING_DIRECTORY="/root/HSM_DPOD"
-RUN mkdir -p /root/HSM_DPOD
-WORKDIR /root/HSM_DPOD
 
 # Install the needed tools and libraries
 # Install the needed PKCS libraries for the OS
@@ -14,12 +9,13 @@ RUN yum update -y && \
 
 # Install the HSM DPOD client
 RUN mkdir -p /root/HSM_DPOD && mkdir -p /tmp/HSM_DPOD
-COPY setup-openssl_sign-mar2024-v10.5.0-470.zip  /tmp/HSM_DPOD
+COPY setup-JarCodeSigner_Mar2024.zip  /tmp/HSM_DPOD
 RUN cd /tmp/HSM_DPOD && \
-    unzip setup-openssl_sign-mar2024-v10.5.0-470.zip && \
+    unzip setup-JarCodeSigner_Mar2024.zip && \
     tar -xvf cvclient-min.tar && \
     cp -Rf /tmp/HSM_DPOD/* /root/HSM_DPOD && \
     rm -rf /tmp/HSM_DPOD && \
+    rm -f /root/HSM_DPOD/setup-JarCodeSigner_Mar2024.zip && \
     chmod -Rf 755 /root/HSM_DPOD/* && cp /root/HSM_DPOD/Chrystoki.conf /etc/Chrystoki.conf
 
 # disable subscription-manager plugin
@@ -35,13 +31,10 @@ RUN cosign version
 
 
 # Set the Environment variables for the DPOD Client
-RUN cd /root/HSM_DPOD && \
-    source ./setenv
-RUN echo "source ./setenv" >> ~/.bashrc
+WORKDIR /root/HSM_DPOD
+RUN source ./setenv
+RUN echo "cd /root/HSM_DPOD && source ./setenv && cd /dpod" >> ~/.bashrc
 
-# Install the Docker Client
-# RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-# RUN yum install docker-ce -y
 
 # Install the Docker Client
 RUN dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
@@ -71,6 +64,6 @@ RUN pip3.10 install --no-cache-dir --upgrade -r /dpod/requirements.txt
 COPY ./app /dpod/app
 
 # start the FastAPI application
-ENTRYPOINT ["/bin/sh", "/dpod/startup-uvicorn.sh"]
+ENTRYPOINT ["/bin/bash", "/dpod/startup-uvicorn.sh",]
 
 #End of the Dockerfile
