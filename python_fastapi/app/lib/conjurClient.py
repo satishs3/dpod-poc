@@ -2,7 +2,7 @@ import os
 import base64
 from conjur import Client
 from app.logger import logger
-from kubernetesClient import KubernetesClient
+from app.lib.kubernetesClient import KubernetesClient
 
 # Conjur variables
 CONJUR_ACCOUNT = 'prod'
@@ -53,7 +53,7 @@ class ConjurClient:
                 pem_fp.write(kube_secret['password'])
         return pem_file
 
-    def get_secret(self):
+    def get_secret(self, keyLabel):
         '''
         Get secret from conjur safe
         '''
@@ -78,7 +78,7 @@ class ConjurClient:
 
                 # Get the <variable_id> used to fetch the secret value
                 #   prodvault/devops/<safe>/Operating System-SSHKeyVaulting-kubeconfig-<cluster>/password
-                variable_id = "prodvault/devops/S-CJR-DPO-O-DPO/Misc-GenericPasswordVault-TestConjur-TestConjur/password"
+                variable_id = f"prodvault/devops/S-CJR-DPO-O-DPO/Misc-GenericPasswordVault-{keyLabel}-{keyLabel}/password"
 
                 # Fetch secret value for <variable_id>
                 secret_value = client.get(variable_id)
