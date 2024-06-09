@@ -1,10 +1,10 @@
-import docker
+import os
 import subprocess
-from fastapi import FastAPI, status
-from pydantic import BaseModel
-from typing import Optional
-from logger import logger
+from app.lib.conjurClient import ConjurClient
 from app.middleware import log_requests
+from fastapi import FastAPI, status
+from logger import logger
+from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI()
@@ -12,56 +12,62 @@ app.add_middleware(BaseHTTPMiddleware, dispatch=log_requests)
 
 logger.debug("Starting the application")
 
-class ImageRegistry(BaseModel):
-    registry_url: str
-    userid: str
-    password: str
-
-sign_key = {
-    "slotName": "pkcs11:token=openssl_sign_DPOD",
-    "slotId": "slot-id=3",
-    "id": "id=%70%83%8e%fd%71%63%43%24%6b%cc%36%eb%82%b9%0e%bc%c2%cb%80%8f",
-    "object": "object=Cloud-Insights-Docker?module-path=/root/HSM_DPOD/libs/64/libCryptoki2.so",
-    "pinValue": "&pin-value=NewCOPass"
-}
-class Image(BaseModel):
+class toSign(BaseModel):
     image_url: str
-    sign_key: dict
-    requestor: str = None
-    team: Optional[str] = None
+    key_label: str
+
+class toVerify(BaseModel):
+    image_url: str
+    key_label: str
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@app.post("/registry/login")
-def login_to_registry(registry: ImageRegistry):
-    # Login to the registry
-
-    client = docker.from_env()
-    try:
-        client.login(username=registry.userid, password=registry.password, registry=registry.registry_url)
-    except docker.errors.APIError as e:
-        return {"message": "Failed to login to registry", "error": str(e)}
-
-    # Call the function
-    login_to_registry(registry)
-    return {"message": "Login to registry successful"}
-
 @app.post("/sign/image/", status_code=status.HTTP_201_CREATED)
-def sign_image(payload: Image):
-    print(payload)
-    signing_key = sign_key["slotName"] + ';' + sign_key["slotId"] + ';' + sign_key["id"] + ';' + sign_key["object"] + sign_key["pinValue"]
-    cosign_command = "cosign sign -key " + signing_key + " " + payload.image_url
-    # execute the cosign_command
+def sign_image(payload: toSign):
+    conjur_client = ConjurClient()
+    secret = conjur_client.get_secret(payload.key_label)
+    if secret is None:
+        return {"message": "secret could not be retrieved conjur"}
+    input_cmd_list = []
+    script_command = f"python3 /dpod/app/sign_image.py {payload.image_url} {secret}"
+    input_cmd_list.append(script_command)
     try:
-        subprocess.run(cosign_command, shell=True, check=True)
+        process = subprocess.check_output(
+                  input_cmd_list,
+                  shell=True,
+                  timeout=60
+            )
     except subprocess.CalledProcessError as e:
-        return {"message": "Failed to sign image", "error": str(e)}
-    return {"message": "Image signed successfully",
-            "image name": f"signed image {payload.image_url}"}
+        return {"message": "error while handling the request", "error": str(e)}
+    return {"message": "image signing response", "output": f"{process.decode('utf-8')}"}
+
+@app.post("/verify/image/", status_code=status.HTTP_201_CREATED)
+def verify_image(payload: toVerify):
+    filename = f"/dpod/app/{payload.key_label}.pub"
+    if os.path.exists(filename) == False:
+        conjur_client = ConjurClient()
+        secret = conjur_client.get_secret(payload.key_label)
+        # write the secret to a file
+        if secret is None:
+            return {"message": "secret could not be retrieved conjur"}
+        secret = str(secret).replace("\\n", "\n").strip()
+        with open(filename, "w") as f:
+            f.write(secret)
+    input_cmd_list = []
+    script_command = f"python3 /dpod/app/verify_image.py {payload.image_url} {filename}"
+    input_cmd_list.append(script_command)
+    try:
+        process = subprocess.check_output(
+                  input_cmd_list,
+                  shell=True,
+                  timeout=60
+            )
+    except subprocess.CalledProcessError as e:
+        return {"message": "error while handling the request", "error": str(e)}
+    return {"message": "image signature verification response", "output": f"{process.decode('utf-8')}"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0,0,0,0", port=8000)
-
+    uvicorn.run(app, host="0,0,0,0", port=8000,reload=True)
